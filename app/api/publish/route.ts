@@ -7,11 +7,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const apiKey = process.env.BLOTATO_API_KEY;
-    const accountId = process.env.BLOTATO_ACCOUNT_ID;
+    const platform = body.platform || 'instagram'; // 'instagram' | 'youtube' | 'twitter' | 'pinterest'
 
-    // Check if user requested a specific media item or next in queue
     let targetItem = body.item;
-
     if (!targetItem) {
       const assets = await fetchCloudinaryAssets();
       if (assets.length === 0) {
@@ -20,28 +18,64 @@ export async function POST(req: Request) {
       targetItem = assets[0];
     }
 
-    if (!apiKey || !accountId) {
+    if (!apiKey) {
       return NextResponse.json({
         success: false,
-        warning: 'BLOTATO_API_KEY or BLOTATO_ACCOUNT_ID is missing. Please configure it in your environment.',
-        itemReadyToPost: targetItem,
+        warning: 'BLOTATO_API_KEY is missing. Please configure it in your environment.',
       }, { status: 400 });
     }
 
-    // Call Blotato API
-    const blotatoResponse = await fetch('https://api.blotato.com/v1/posts', {
+    // Determine account ID based on platform
+    let accountId = process.env.BLOTATO_INSTAGRAM_ACCOUNT_ID || '65790';
+    let targetConfig: any = { targetType: 'instagram' };
+
+    if (platform === 'youtube') {
+      accountId = process.env.BLOTATO_YOUTUBE_ACCOUNT_ID || '47058';
+      targetConfig = {
+        targetType: 'youtube',
+        title: 'DesiDreams Aesthetic Vibes ✨',
+        privacyStatus: 'public',
+        shouldNotifySubscribers: true,
+      };
+    } else if (platform === 'twitter' || platform === 'x') {
+      accountId = process.env.BLOTATO_X_ACCOUNT_ID || '24443';
+      targetConfig = {
+        targetType: 'twitter',
+      };
+    } else if (platform === 'pinterest') {
+      accountId = process.env.BLOTATO_PINTEREST_ACCOUNT_ID || '9234';
+      targetConfig = {
+        targetType: 'pinterest',
+        link: 'https://desidreams.fun',
+      };
+    } else {
+      // Instagram
+      targetConfig = {
+        targetType: 'instagram',
+        firstComment: '✨ Instant Access: https://desidreams.fun (Direct Link)',
+      };
+    }
+
+    const payload = {
+      post: {
+        accountId: accountId,
+        content: {
+          text: targetItem.caption,
+          mediaUrls: [targetItem.secureUrl],
+          platform: platform === 'x' ? 'twitter' : platform,
+        },
+        target: targetConfig,
+      },
+    };
+
+    // Official Blotato v2 API endpoint
+    const blotatoResponse = await fetch('https://backend.blotato.com/v2/posts', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'blotato-api-key': apiKey.trim(),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        accountId: accountId,
-        mediaType: targetItem.mediaType,
-        mediaUrl: targetItem.secureUrl,
-        caption: targetItem.caption,
-        firstComment: '✨ Full collection: https://desidreams.fun (Direct Link)',
-      }),
+      body: JSON.stringify(payload),
     });
 
     const result = await blotatoResponse.json();
@@ -49,13 +83,14 @@ export async function POST(req: Request) {
     if (!blotatoResponse.ok) {
       return NextResponse.json({
         success: false,
-        error: result.message || 'Blotato API error',
+        error: result.message || JSON.stringify(result),
         raw: result,
       }, { status: blotatoResponse.status });
     }
 
     return NextResponse.json({
       success: true,
+      platform,
       publishedItem: targetItem,
       blotatoResult: result,
     });

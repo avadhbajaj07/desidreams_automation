@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Instagram, 
+  Youtube, 
+  Twitter, 
   Sparkles, 
   RefreshCw, 
   Send, 
@@ -12,7 +14,8 @@ import {
   Clock, 
   ExternalLink,
   Layers,
-  AlertCircle
+  AlertCircle,
+  Share2
 } from 'lucide-react';
 
 interface MediaItem {
@@ -28,7 +31,7 @@ interface MediaItem {
 export default function Dashboard() {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [publishing, setPublishing] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState<{ id: string; platform: string } | null>(null);
   const [filter, setFilter] = useState<'ALL' | 'REEL' | 'IMAGE'>('ALL');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
@@ -53,22 +56,25 @@ export default function Dashboard() {
     fetchMedia();
   }, []);
 
-  const handlePublish = async (item: MediaItem) => {
-    setPublishing(item.id);
+  const handlePublish = async (item: MediaItem, platform = 'instagram') => {
+    setPublishing({ id: item.id, platform });
     setStatusMessage(null);
     try {
       const res = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item }),
+        body: JSON.stringify({ item, platform }),
       });
       const data = await res.json();
       if (data.success) {
-        setStatusMessage({ type: 'success', text: `Successfully sent "${item.publicId}" to Blotato API!` });
+        setStatusMessage({ 
+          type: 'success', 
+          text: `🎉 Successfully published "${item.publicId}" to ${platform.toUpperCase()}! (Post Submission ID: ${data.blotatoResult?.postSubmissionId || 'Active'})` 
+        });
       } else {
         setStatusMessage({ 
           type: 'error', 
-          text: data.warning || data.error || 'Blotato API credentials need to be configured in Vercel environment variables.' 
+          text: data.error || data.warning || 'Failed to publish via Blotato.' 
         });
       }
     } catch (err: any) {
@@ -89,27 +95,22 @@ export default function Dashboard() {
   return (
     <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px 80px' }}>
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '32px', borderBottom: '1px solid #1e2638', paddingBottom: '24px' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '28px', borderBottom: '1px solid #1e2638', paddingBottom: '24px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <div style={{ background: 'linear-gradient(135deg, #f59e0b, #ec4899)', padding: '10px', borderRadius: '12px', display: 'flex' }}>
               <Instagram size={24} color="#ffffff" />
             </div>
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Automation Hub</h1>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Omni-Channel Automation</h1>
               <p style={{ fontSize: '14px', color: '#8e9bb2' }}>
-                Auto-publishing to Instagram from Cloudinary ➔ Target: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
+                Auto-publishing to Instagram, YouTube, X & Pinterest ➔ Target: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
               </p>
             </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div style={{ background: '#121722', border: '1px solid #253047', borderRadius: '8px', padding: '8px 14px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
-            <span style={{ color: '#8e9bb2' }}>Cloud: <strong style={{ color: '#f0f4fc' }}>qtah71h2</strong></span>
-          </div>
-
           <button
             onClick={fetchMedia}
             disabled={loading}
@@ -124,14 +125,48 @@ export default function Dashboard() {
               color: '#ffffff',
               fontSize: '14px',
               fontWeight: '500',
-              transition: 'background 0.2s',
             }}
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            Sync Media
+            Sync Cloudinary
           </button>
         </div>
       </header>
+
+      {/* Connected Channels Bar */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '28px' }}>
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Instagram size={18} color="#ec4899" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Instagram</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>@desi_dreams_fun</div>
+          </div>
+        </div>
+
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Youtube size={18} color="#ef4444" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>YouTube Shorts</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>Desi Dreams</div>
+          </div>
+        </div>
+
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Twitter size={18} color="#38bdf8" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>X / Twitter</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>@desiDreams_fun</div>
+          </div>
+        </div>
+
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Share2 size={18} color="#e11d48" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Pinterest</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>desidreamsfun</div>
+          </div>
+        </div>
+      </section>
 
       {/* Status Alerts */}
       {statusMessage && (
@@ -182,15 +217,15 @@ export default function Dashboard() {
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>VERCEL CRON SCHEDULE</span>
+            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>AUTO CRON SCHEDULE</span>
             <Clock size={18} color="#10b981" />
           </div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', marginTop: '4px' }}>3x Daily (Active)</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>12:00 PM • 4:30 PM • 8:30 PM IST</div>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', marginTop: '4px' }}>Daily 7:00 PM IST</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>Vercel Cron Active</div>
         </div>
       </section>
 
-      {/* Filter Tabs & Quick Action */}
+      {/* Filter Tabs */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', gap: '8px', background: '#121620', padding: '4px', borderRadius: '8px', border: '1px solid #1e2638' }}>
           {(['ALL', 'REEL', 'IMAGE'] as const).map((type) => (
@@ -316,27 +351,74 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handlePublish(item)}
-                  disabled={publishing === item.id}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: '#ffffff',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <Send size={14} />
-                  {publishing === item.id ? 'Sending to Blotato...' : 'Publish to Instagram'}
-                </button>
+                {/* Platform Action Buttons */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    onClick={() => handlePublish(item, 'instagram')}
+                    disabled={publishing?.id === item.id}
+                    style={{
+                      padding: '8px',
+                      background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Instagram size={13} />
+                    {publishing?.id === item.id && publishing.platform === 'instagram' ? 'Posting...' : 'Instagram'}
+                  </button>
+
+                  <button
+                    onClick={() => handlePublish(item, 'twitter')}
+                    disabled={publishing?.id === item.id}
+                    style={{
+                      padding: '8px',
+                      background: '#1d2535',
+                      border: '1px solid #2e3a52',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Twitter size={13} color="#38bdf8" />
+                    {publishing?.id === item.id && publishing.platform === 'twitter' ? 'Posting...' : 'X (Twitter)'}
+                  </button>
+
+                  {item.mediaType === 'REEL' && (
+                    <button
+                      onClick={() => handlePublish(item, 'youtube')}
+                      disabled={publishing?.id === item.id}
+                      style={{
+                        padding: '8px',
+                        background: '#1d2535',
+                        border: '1px solid #2e3a52',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                        gridColumn: 'span 2',
+                      }}
+                    >
+                      <Youtube size={13} color="#ef4444" />
+                      {publishing?.id === item.id && publishing.platform === 'youtube' ? 'Posting...' : 'Post to YouTube Shorts'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

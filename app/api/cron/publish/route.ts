@@ -8,19 +8,17 @@ export async function GET(req: Request) {
     const authHeader = req.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
-    // If CRON_SECRET is set, verify authorization header
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const apiKey = process.env.BLOTATO_API_KEY;
-    const accountId = process.env.BLOTATO_ACCOUNT_ID;
+    const accountId = process.env.BLOTATO_INSTAGRAM_ACCOUNT_ID || '65790';
 
-    if (!apiKey || !accountId) {
-      console.warn('Blotato credentials not configured for Cron execution.');
+    if (!apiKey) {
       return NextResponse.json({
         success: false,
-        message: 'Cron executed but Blotato API key/account ID are not configured yet in environment.',
+        message: 'Cron executed but BLOTATO_API_KEY is missing.',
       });
     }
 
@@ -32,20 +30,28 @@ export async function GET(req: Request) {
     // Pick next item
     const postItem = assets[0];
 
-    // Call Blotato API
-    const blotatoResponse = await fetch('https://api.blotato.com/v1/posts', {
+    const payload = {
+      post: {
+        accountId: accountId,
+        content: {
+          text: postItem.caption,
+          mediaUrls: [postItem.secureUrl],
+          platform: 'instagram',
+        },
+        target: {
+          targetType: 'instagram',
+          firstComment: '✨ Instant Access: https://desidreams.fun',
+        },
+      },
+    };
+
+    const blotatoResponse = await fetch('https://backend.blotato.com/v2/posts', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'blotato-api-key': apiKey.trim(),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        accountId: accountId,
-        mediaType: postItem.mediaType,
-        mediaUrl: postItem.secureUrl,
-        caption: postItem.caption,
-        firstComment: '✨ Instant Access: https://desidreams.fun',
-      }),
+      body: JSON.stringify(payload),
     });
 
     const result = await blotatoResponse.json();
