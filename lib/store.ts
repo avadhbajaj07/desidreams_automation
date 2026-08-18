@@ -21,23 +21,24 @@ export interface MediaItem {
   blotatoPostId?: string;
 }
 
-// Default caption templates
+// Engaging rotating hooks
 const CAPTION_HOOKS = [
-  "✨ Aesthetic dreams you don't want to miss.",
-  "🌟 Bringing you the finest vibes everyday.",
+  "✨ Dream aesthetic vibes you can't miss.",
+  "🌟 Bringing you the finest exclusive vibes.",
   "💫 Pure aesthetic inspiration for your daily feed.",
-  "🔥 Unlocking the ultimate collection. Don't miss out.",
-  "💎 Exclusively crafted for the true dreamers."
+  "🔥 Unlocking the ultimate collection. Check it out.",
+  "💎 Exclusively crafted moments for true dreamers."
 ];
 
-const HASHTAGS = "#desidreams #aesthetic #reelsindia #trending #viralreels #dailyinspiration #explorepage";
+// STRICT LIMIT: Exactly 5 targeted hashtags
+const HASHTAGS = "#desidreams #aesthetic #reelsindia #trending #viralreels";
 
-export async function fetchCloudinaryAssets(folderName = 'desi dreams sober'): Promise<MediaItem[]> {
+export async function fetchCloudinaryAssets(): Promise<MediaItem[]> {
   const mediaItems: MediaItem[] = [];
 
   try {
-    // Search both the specific folder and any matching tags/ids
-    const expression = `folder:"${folderName}" OR folder:"${folderName}/*" OR public_id:desi_dreams*`;
+    // Search images and videos across all DesiDreams folders and prefixes
+    const expression = 'public_id:dreams_desi* OR public_id:desi_dreams* OR folder:"desi dreams sober" OR folder:"desi_dreams_video" OR folder:"desi_dreams_fun"';
     
     const result = await cloudinary.search
       .expression(expression)
@@ -61,7 +62,7 @@ export async function fetchCloudinaryAssets(folderName = 'desi dreams sober'): P
         mediaType: isVideo ? 'REEL' : 'IMAGE',
         caption: caption,
         status: 'pending',
-        folder: item.folder || folderName,
+        folder: item.folder || 'desidreams',
         createdAt: item.created_at || new Date().toISOString(),
       });
     });

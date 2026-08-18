@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Layers,
   AlertCircle,
-  Share2
+  Share2,
+  Rocket
 } from 'lucide-react';
 
 interface MediaItem {
@@ -56,7 +57,7 @@ export default function Dashboard() {
     fetchMedia();
   }, []);
 
-  const handlePublish = async (item: MediaItem, platform = 'instagram') => {
+  const handlePublish = async (item: MediaItem, platform = 'all') => {
     setPublishing({ id: item.id, platform });
     setStatusMessage(null);
     try {
@@ -67,9 +68,10 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (data.success) {
+        const platformsStr = data.publishedPlatforms ? data.publishedPlatforms.join(', ').toUpperCase() : platform.toUpperCase();
         setStatusMessage({ 
           type: 'success', 
-          text: `🎉 Successfully queued "${item.publicId}" to ${platform.toUpperCase()}! (Post Submission ID: ${data.blotatoResult?.postSubmissionId || 'Active'})` 
+          text: `🎉 Successfully dispatched "${item.publicId}" across: ${platformsStr}!` 
         });
       } else {
         setStatusMessage({ 
@@ -102,9 +104,9 @@ export default function Dashboard() {
               <Instagram size={24} color="#ffffff" />
             </div>
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Omni-Channel Automation</h1>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Omni-Channel Automation Hub</h1>
               <p style={{ fontSize: '14px', color: '#8e9bb2' }}>
-                Auto-publishing to Instagram, YouTube, Pinterest & X ➔ Target: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
+                Simultaneous publishing to Instagram, YouTube Shorts, X & Pinterest ➔ <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
               </p>
             </div>
           </div>
@@ -144,14 +146,6 @@ export default function Dashboard() {
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Share2 size={18} color="#e11d48" />
-          <div>
-            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Pinterest (9234)</div>
-            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>desidreamsfun</div>
-          </div>
-        </div>
-
-        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Youtube size={18} color="#ef4444" />
           <div>
             <div style={{ fontSize: '12px', color: '#8e9bb2' }}>YouTube Shorts (47058)</div>
@@ -164,6 +158,14 @@ export default function Dashboard() {
           <div>
             <div style={{ fontSize: '12px', color: '#8e9bb2' }}>X / Twitter (24443)</div>
             <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>@desiDreams_fun</div>
+          </div>
+        </div>
+
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Share2 size={18} color="#e11d48" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Pinterest (9234)</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>desidreamsfun</div>
           </div>
         </div>
       </section>
@@ -190,11 +192,11 @@ export default function Dashboard() {
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '32px' }}>
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>TOTAL MEDIA QUEUED</span>
+            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>TOTAL MEDIA READY</span>
             <Layers size={18} color="#f59e0b" />
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{items.length}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Folder: &quot;desi dreams sober&quot;</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Images & Reels Ready</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
@@ -203,7 +205,7 @@ export default function Dashboard() {
             <Film size={18} color="#ec4899" />
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{reelsCount}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>9:16 Video Format</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Ready for All Platforms</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
@@ -212,16 +214,16 @@ export default function Dashboard() {
             <ImageIcon size={18} color="#3b82f6" />
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{imagesCount}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Pins & Feed Posts</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Max 5 Clean #tags</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>AUTO CRON SCHEDULE</span>
+            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>AUTOMATED SCHEDULE</span>
             <Clock size={18} color="#10b981" />
           </div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', marginTop: '4px' }}>Daily 7:00 PM IST</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>Vercel Cron Active</div>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', marginTop: '4px' }}>Daily 5:00 PM IST</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>Starts Aug 24, 2026 (5-Day Delay)</div>
         </div>
       </section>
 
@@ -242,7 +244,7 @@ export default function Dashboard() {
                 fontWeight: '600',
               }}
             >
-              {type === 'ALL' ? `All (${items.length})` : type === 'REEL' ? `Reels (${reelsCount})` : `Images (${imagesCount})`}
+              {type === 'ALL' ? `All (${items.length})` : type === 'REEL' ? `Videos/Reels (${reelsCount})` : `Images (${imagesCount})`}
             </button>
           ))}
         </div>
@@ -259,7 +261,7 @@ export default function Dashboard() {
           <p style={{ color: '#8e9bb2' }}>No media items found for this filter.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
           {filteredItems.map((item) => (
             <div
               key={item.id}
@@ -273,7 +275,7 @@ export default function Dashboard() {
               }}
             >
               {/* Media Preview Box */}
-              <div style={{ height: '220px', background: '#0a0d14', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ height: '230px', background: '#0a0d14', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {item.mediaType === 'IMAGE' ? (
                   <img
                     src={item.secureUrl}
@@ -352,82 +354,43 @@ export default function Dashboard() {
                 </div>
 
                 {/* Platform Action Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {/* Master Button: Post to All Platforms */}
                   <button
-                    onClick={() => handlePublish(item, 'instagram')}
+                    onClick={() => handlePublish(item, 'all')}
                     disabled={publishing?.id === item.id}
                     style={{
-                      padding: '8px',
+                      width: '100%',
+                      padding: '10px',
                       background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
                       border: 'none',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: '600',
+                      fontSize: '13px',
+                      fontWeight: '700',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '4px',
+                      gap: '6px',
                     }}
                   >
-                    <Instagram size={13} />
-                    {publishing?.id === item.id && publishing.platform === 'instagram' ? 'Posting...' : 'Instagram'}
+                    <Rocket size={15} />
+                    {publishing?.id === item.id && publishing.platform === 'all' 
+                      ? 'Syndicating Across All Channels...' 
+                      : item.mediaType === 'REEL' ? '🚀 Post to All 4 Platforms' : '🚀 Post to All 3 Platforms'}
                   </button>
 
-                  <button
-                    onClick={() => handlePublish(item, 'pinterest')}
-                    disabled={publishing?.id === item.id}
-                    style={{
-                      padding: '8px',
-                      background: '#1d2535',
-                      border: '1px solid #e11d48',
-                      borderRadius: '6px',
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <Share2 size={13} color="#e11d48" />
-                    {publishing?.id === item.id && publishing.platform === 'pinterest' ? 'Pinning...' : 'Pinterest'}
-                  </button>
-
-                  <button
-                    onClick={() => handlePublish(item, 'twitter')}
-                    disabled={publishing?.id === item.id}
-                    style={{
-                      padding: '8px',
-                      background: '#1d2535',
-                      border: '1px solid #2e3a52',
-                      borderRadius: '6px',
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px',
-                      gridColumn: item.mediaType === 'REEL' ? 'auto' : 'span 2',
-                    }}
-                  >
-                    <Twitter size={13} color="#38bdf8" />
-                    {publishing?.id === item.id && publishing.platform === 'twitter' ? 'Posting...' : 'X (Twitter)'}
-                  </button>
-
-                  {item.mediaType === 'REEL' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                     <button
-                      onClick={() => handlePublish(item, 'youtube')}
+                      onClick={() => handlePublish(item, 'instagram')}
                       disabled={publishing?.id === item.id}
                       style={{
-                        padding: '8px',
+                        padding: '6px',
                         background: '#1d2535',
                         border: '1px solid #2e3a52',
                         borderRadius: '6px',
                         color: '#ffffff',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: '600',
                         display: 'flex',
                         alignItems: 'center',
@@ -435,8 +398,74 @@ export default function Dashboard() {
                         gap: '4px',
                       }}
                     >
-                      <Youtube size={13} color="#ef4444" />
-                      {publishing?.id === item.id && publishing.platform === 'youtube' ? 'Posting...' : 'Shorts'}
+                      <Instagram size={12} color="#ec4899" />
+                      Instagram
+                    </button>
+
+                    <button
+                      onClick={() => handlePublish(item, 'pinterest')}
+                      disabled={publishing?.id === item.id}
+                      style={{
+                        padding: '6px',
+                        background: '#1d2535',
+                        border: '1px solid #2e3a52',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Share2 size={12} color="#e11d48" />
+                      Pinterest
+                    </button>
+
+                    <button
+                      onClick={() => handlePublish(item, 'twitter')}
+                      disabled={publishing?.id === item.id}
+                      style={{
+                        padding: '6px',
+                        background: '#1d2535',
+                        border: '1px solid #2e3a52',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Twitter size={12} color="#38bdf8" />
+                      X (Twitter)
+                    </button>
+                  </div>
+
+                  {item.mediaType === 'REEL' && (
+                    <button
+                      onClick={() => handlePublish(item, 'youtube')}
+                      disabled={publishing?.id === item.id}
+                      style={{
+                        width: '100%',
+                        padding: '6px',
+                        background: '#1d2535',
+                        border: '1px solid #2e3a52',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Youtube size={12} color="#ef4444" />
+                      Post Only to YouTube Shorts
                     </button>
                   )}
                 </div>
