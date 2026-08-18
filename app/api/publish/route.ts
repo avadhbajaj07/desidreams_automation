@@ -44,9 +44,28 @@ export async function POST(req: Request) {
       };
     } else if (platform === 'pinterest') {
       accountId = process.env.BLOTATO_PINTEREST_ACCOUNT_ID || '9234';
+      
+      // Fetch boards if available
+      let boardId = body.boardId || process.env.BLOTATO_PINTEREST_BOARD_ID;
+      if (!boardId) {
+        try {
+          const boardsRes = await fetch(`https://backend.blotato.com/v2/users/me/accounts/${accountId}/subaccounts`, {
+            headers: { 'blotato-api-key': apiKey.trim() }
+          });
+          const boardsData = await boardsRes.json();
+          if (boardsData.items && boardsData.items.length > 0) {
+            boardId = boardsData.items[0].id;
+          }
+        } catch (e) {
+          console.warn('Could not auto-fetch Pinterest board ID:', e);
+        }
+      }
+
       targetConfig = {
         targetType: 'pinterest',
+        title: 'DesiDreams Aesthetic Collection',
         link: 'https://desidreams.fun',
+        ...(boardId ? { boardId } : {}),
       };
     } else {
       // Instagram

@@ -69,7 +69,7 @@ export default function Dashboard() {
       if (data.success) {
         setStatusMessage({ 
           type: 'success', 
-          text: `🎉 Successfully published "${item.publicId}" to ${platform.toUpperCase()}! (Post Submission ID: ${data.blotatoResult?.postSubmissionId || 'Active'})` 
+          text: `🎉 Successfully queued "${item.publicId}" to ${platform.toUpperCase()}! (Post Submission ID: ${data.blotatoResult?.postSubmissionId || 'Active'})` 
         });
       } else {
         setStatusMessage({ 
@@ -104,7 +104,7 @@ export default function Dashboard() {
             <div>
               <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Omni-Channel Automation</h1>
               <p style={{ fontSize: '14px', color: '#8e9bb2' }}>
-                Auto-publishing to Instagram, YouTube, X & Pinterest ➔ Target: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
+                Auto-publishing to Instagram, YouTube, Pinterest & X ➔ Target: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
               </p>
             </div>
           </div>
@@ -138,15 +138,23 @@ export default function Dashboard() {
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Instagram size={18} color="#ec4899" />
           <div>
-            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Instagram</div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Instagram (65790)</div>
             <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>@desi_dreams_fun</div>
+          </div>
+        </div>
+
+        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Share2 size={18} color="#e11d48" />
+          <div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Pinterest (9234)</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>desidreamsfun</div>
           </div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Youtube size={18} color="#ef4444" />
           <div>
-            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>YouTube Shorts</div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>YouTube Shorts (47058)</div>
             <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>Desi Dreams</div>
           </div>
         </div>
@@ -154,16 +162,8 @@ export default function Dashboard() {
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Twitter size={18} color="#38bdf8" />
           <div>
-            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>X / Twitter</div>
+            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>X / Twitter (24443)</div>
             <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>@desiDreams_fun</div>
-          </div>
-        </div>
-
-        <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '10px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Share2 size={18} color="#e11d48" />
-          <div>
-            <div style={{ fontSize: '12px', color: '#8e9bb2' }}>Pinterest</div>
-            <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4fc' }}>desidreamsfun</div>
           </div>
         </div>
       </section>
@@ -212,7 +212,7 @@ export default function Dashboard() {
             <ImageIcon size={18} color="#3b82f6" />
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{imagesCount}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Square & Portrait</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Pins & Feed Posts</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
@@ -375,6 +375,27 @@ export default function Dashboard() {
                   </button>
 
                   <button
+                    onClick={() => handlePublish(item, 'pinterest')}
+                    disabled={publishing?.id === item.id}
+                    style={{
+                      padding: '8px',
+                      background: '#1d2535',
+                      border: '1px solid #e11d48',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Share2 size={13} color="#e11d48" />
+                    {publishing?.id === item.id && publishing.platform === 'pinterest' ? 'Pinning...' : 'Pinterest'}
+                  </button>
+
+                  <button
                     onClick={() => handlePublish(item, 'twitter')}
                     disabled={publishing?.id === item.id}
                     style={{
@@ -389,6 +410,7 @@ export default function Dashboard() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '4px',
+                      gridColumn: item.mediaType === 'REEL' ? 'auto' : 'span 2',
                     }}
                   >
                     <Twitter size={13} color="#38bdf8" />
@@ -411,11 +433,10 @@ export default function Dashboard() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '4px',
-                        gridColumn: 'span 2',
                       }}
                     >
                       <Youtube size={13} color="#ef4444" />
-                      {publishing?.id === item.id && publishing.platform === 'youtube' ? 'Posting...' : 'Post to YouTube Shorts'}
+                      {publishing?.id === item.id && publishing.platform === 'youtube' ? 'Posting...' : 'Shorts'}
                     </button>
                   )}
                 </div>
