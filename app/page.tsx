@@ -71,7 +71,7 @@ export default function Dashboard() {
         const platformsStr = data.publishedPlatforms ? data.publishedPlatforms.join(', ').toUpperCase() : platform.toUpperCase();
         setStatusMessage({ 
           type: 'success', 
-          text: `🎉 Successfully dispatched "${item.publicId}" across: ${platformsStr}!` 
+          text: `🎉 Successfully dispatched "${item.publicId}" to ${platformsStr}!` 
         });
       } else {
         setStatusMessage({ 
@@ -104,9 +104,9 @@ export default function Dashboard() {
               <Instagram size={24} color="#ffffff" />
             </div>
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Omni-Channel Automation Hub</h1>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '-0.5px' }}>DesiDreams Dual-Schedule Automation Hub</h1>
               <p style={{ fontSize: '14px', color: '#8e9bb2' }}>
-                Simultaneous publishing to Instagram, YouTube Shorts, X & Pinterest ➔ <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
+                Reels @ 5 PM • Images @ 7 PM ➔ Website: <a href="https://desidreams.fun" target="_blank" rel="noreferrer" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '600' }}>desidreams.fun ↗</a>
               </p>
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Metric Cards */}
+      {/* Metric & Schedule Cards */}
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '32px' }}>
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
@@ -196,34 +196,34 @@ export default function Dashboard() {
             <Layers size={18} color="#f59e0b" />
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{items.length}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Images & Reels Ready</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>{reelsCount} Reels + {imagesCount} Images</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>REELS / VIDEOS</span>
+            <span style={{ fontSize: '13px', color: '#ec4899', fontWeight: '600' }}>REELS SCHEDULE</span>
             <Film size={18} color="#ec4899" />
           </div>
-          <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{reelsCount}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Ready for All Platforms</div>
+          <div style={{ fontSize: '20px', fontWeight: '700', color: '#ffffff' }}>Daily 5:00 PM IST</div>
+          <div style={{ fontSize: '12px', color: '#f43f5e', marginTop: '4px' }}>Starts Aug 24 (In 5 Days)</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>IMAGES / POSTS</span>
+            <span style={{ fontSize: '13px', color: '#3b82f6', fontWeight: '600' }}>IMAGES SCHEDULE</span>
             <ImageIcon size={18} color="#3b82f6" />
           </div>
-          <div style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff' }}>{imagesCount}</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '4px' }}>Max 5 Clean #tags</div>
+          <div style={{ fontSize: '20px', fontWeight: '700', color: '#ffffff' }}>Daily 7:00 PM IST</div>
+          <div style={{ fontSize: '12px', color: '#10b981', marginTop: '4px' }}>Starts TODAY (Aug 19)</div>
         </div>
 
         <div style={{ background: '#121620', border: '1px solid #1e2638', borderRadius: '12px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>AUTOMATED SCHEDULE</span>
-            <Clock size={18} color="#10b981" />
+            <span style={{ fontSize: '13px', color: '#8e9bb2', fontWeight: '500' }}>HASHTAGS & CTA</span>
+            <Sparkles size={18} color="#f59e0b" />
           </div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', marginTop: '4px' }}>Daily 5:00 PM IST</div>
-          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>Starts Aug 24, 2026 (5-Day Delay)</div>
+          <div style={{ fontSize: '16px', fontWeight: '700', color: '#f59e0b' }}>Max 5 Tags Active</div>
+          <div style={{ fontSize: '12px', color: '#62728d', marginTop: '6px' }}>Targeting desidreams.fun</div>
         </div>
       </section>
 
@@ -376,8 +376,8 @@ export default function Dashboard() {
                   >
                     <Rocket size={15} />
                     {publishing?.id === item.id && publishing.platform === 'all' 
-                      ? 'Syndicating Across All Channels...' 
-                      : item.mediaType === 'REEL' ? '🚀 Post to All 4 Platforms' : '🚀 Post to All 3 Platforms'}
+                      ? 'Syndicating Across Channels...' 
+                      : item.mediaType === 'REEL' ? '🚀 Post to All Platforms' : '🚀 Post to All Platforms'}
                   </button>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
